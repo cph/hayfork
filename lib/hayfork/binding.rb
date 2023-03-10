@@ -66,6 +66,7 @@ module Hayfork
 
     def before_rails61?
       return true if ActiveRecord::VERSION::MAJOR < 6
+      return false if ActiveRecord::VERSION::MAJOR > 6
 
       ActiveRecord::VERSION::MINOR < 1
     end
