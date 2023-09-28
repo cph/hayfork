@@ -2,7 +2,7 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "hayfork"
 
 require "minitest/reporters/turn_reporter"
-MiniTest::Reporters.use! Minitest::Reporters::TurnReporter.new
+Minitest::Reporters.use! Minitest::Reporters::TurnReporter.new
 
 require "database_cleaner"
 require "shoulda/context"
