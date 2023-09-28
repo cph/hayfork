@@ -24,6 +24,10 @@ module Hayfork
           value = "#{value}::#{type}"
         end
 
+        if statement.split? && Hayfork::SEARCH_VECTOR == column.name
+          value = "unnest(string_to_array(#{value}, E'#{statement.split_on}'))"
+        end
+
         if statement.unnest? && [Hayfork::SEARCH_VECTOR, Hayfork::TEXT].member?(column.name)
           value = "unnest(string_to_array(#{value}, E'\\n'))"
         end

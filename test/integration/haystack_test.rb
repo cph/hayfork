@@ -142,6 +142,23 @@ class HaystackTest < Minitest::Test
     end
   end
 
+  context "Support for split" do
+    setup do
+      triggers do
+        foreach Book do |index|
+          index.insert(:title)
+          index.insert(:description)
+          index.insert(:price).split(".")
+        end
+      end
+    end
+
+    should "split the specified field by the split value" do
+      Book.create!(title: "The Chosen", price: "45.25")
+      assert_equal ["'chosen':2C", "'45':1C", "'25':1C"], Haystack.pluck(:search_vector)
+    end
+  end
+
 
 private
 
