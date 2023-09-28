@@ -5,7 +5,7 @@ require "hayfork/delete_sql"
 
 module Hayfork
   class Statement
-    attr_reader :haystack, :relation, :value
+    attr_reader :haystack, :relation, :value, :split_on
     attr_accessor :weight, :dictionary
 
     def initialize(haystack, relation, field, options={})
@@ -16,6 +16,7 @@ module Hayfork
       @attributes = {}.with_indifferent_access
       @unnest = false
       @unsearchable = false
+      @split_on = nil
 
       case field
       when Arel::Predications
@@ -54,6 +55,11 @@ module Hayfork
       self
     end
 
+    def split(split_on)
+      @split_on = split_on
+      self
+    end
+
     def unsearchable
       @unsearchable = true
       self
@@ -72,6 +78,10 @@ module Hayfork
 
     def unnest?
       @unnest == true
+    end
+
+    def split?
+      !!@split_on
     end
 
     def may_change_on_update?

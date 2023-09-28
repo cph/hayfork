@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 1) do
     t.string   "title", null: false
     t.string   "isbn", null: true
     t.text     "description", null: true
+    t.decimal  "price", null: true
   end
 
   create_table "authors", force: true do |t|
