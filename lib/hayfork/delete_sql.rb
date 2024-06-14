@@ -10,7 +10,7 @@ module Hayfork
 
     def to_sql
       select_statement = relation.select(bindings.map(&:to_s))
-      select_statement = select_statement.from("(SELECT OLD.*) \"#{relation.table_name}\"")
+      select_statement = select_statement.from("old_table \"#{relation.table_name}\"")
 
       constraints = bindings.map { |binding| "#{haystack.table_name}.#{binding.key}=x.#{binding.key}" }.join(" AND ")
 

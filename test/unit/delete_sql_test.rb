@@ -22,7 +22,7 @@ class DeleteSqlTest < Minitest::Test
           USING (SELECT
             'Book'::varchar "search_result_type",
             books.id::integer "search_result_id"
-          FROM (SELECT OLD.*) "books") "x"
+          FROM old_table "books") "x"
           WHERE haystack.search_result_type=x.search_result_type
           AND haystack.search_result_id=x.search_result_id;
         SQL
@@ -36,7 +36,7 @@ class DeleteSqlTest < Minitest::Test
         DELETE FROM haystack
         USING
           (SELECT 'Book'::varchar "search_result_type"
-          FROM (SELECT OLD.*) "books"
+          FROM old_table "books"
           INNER JOIN "authors" ON "authors"."id" = "books"."author_id"
           WHERE "authors"."name" BETWEEN 'Potok' AND 'Tolkien') "x"
         WHERE haystack.search_result_type=x.search_result_type;

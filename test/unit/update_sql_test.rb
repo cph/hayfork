@@ -17,38 +17,13 @@ class UpdateSqlTest < Minitest::Test
         ]
       end
 
-      should "check if relevant values have changed before replacing entries in the Haystack" do
+      should "be made up of the SQL to delete and re-insert relevant entries" do
         stub(update).delete.stub!.to_sql.returns("<!-- DELETE -->")
         stub(update).insert.stub!.to_sql.returns("<!-- INSERT -->")
         assert_equal <<~SQL.squish, update.to_sql.squish.strip
-          IF OLD.title IS DISTINCT FROM NEW.title OR OLD.isbn IS DISTINCT FROM NEW.isbn THEN
-            <!-- DELETE -->
-            <!-- INSERT -->
-          END IF;
+          <!-- DELETE -->
+          <!-- INSERT -->
         SQL
-      end
-
-      context "when the model uses attr_readonly" do
-        setup do
-          Book.attr_readonly :isbn
-          fail "isbn should be readonly now" unless Book.readonly_attributes.member?("isbn")
-        end
-
-        teardown do
-          Book.readonly_attributes.delete "isbn"
-          fail "isbn should not be readonly now" if Book.readonly_attributes.member?("isbn")
-        end
-
-        should "not check values that are readonly" do
-          stub(update).delete.stub!.to_sql.returns("<!-- DELETE -->")
-          stub(update).insert.stub!.to_sql.returns("<!-- INSERT -->")
-          assert_equal <<~SQL.squish, update.to_sql.squish.strip
-            IF OLD.title IS DISTINCT FROM NEW.title THEN
-              <!-- DELETE -->
-              <!-- INSERT -->
-            END IF;
-          SQL
-        end
       end
     end
   end
