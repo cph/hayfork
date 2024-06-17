@@ -38,8 +38,15 @@ class TriggersTest < Minitest::Test
             RETURN NULL; -- result is ignored since this is an AFTER trigger
           END;
           $$ LANGUAGE plpgsql;
-          CREATE TRIGGER maintain_books_in_haystack_trigger BEFORE INSERT OR UPDATE OR DELETE ON books
-          FOR EACH ROW EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_insert_trigger AFTER INSERT ON books
+            REFERENCING NEW TABLE AS new_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_update_trigger AFTER UPDATE ON books
+            REFERENCING OLD TABLE AS old_table NEW TABLE AS new_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_delete_trigger AFTER DELETE ON books
+            REFERENCING OLD TABLE AS old_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
         SQL
       end
 
@@ -67,8 +74,15 @@ class TriggersTest < Minitest::Test
             RETURN NULL; -- result is ignored since this is an AFTER trigger
           END;
           $$ LANGUAGE plpgsql;
-          CREATE TRIGGER maintain_books_in_haystack_trigger BEFORE INSERT OR UPDATE OR DELETE ON books
-          FOR EACH ROW EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_insert_trigger AFTER INSERT ON books
+            REFERENCING NEW TABLE AS new_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_update_trigger AFTER UPDATE ON books
+            REFERENCING OLD TABLE AS old_table NEW TABLE AS new_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
+          CREATE TRIGGER maintain_books_in_haystack_delete_trigger AFTER DELETE ON books
+            REFERENCING OLD TABLE AS old_table
+            FOR EACH STATEMENT EXECUTE PROCEDURE maintain_books_in_haystack();
         SQL
       end
     end

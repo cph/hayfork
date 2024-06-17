@@ -52,8 +52,15 @@ module Hayfork
           RETURN NULL; -- result is ignored since this is an AFTER trigger
         END;
         $$ LANGUAGE plpgsql;
-        CREATE TRIGGER #{name}_trigger BEFORE INSERT OR UPDATE OR DELETE ON #{model.table_name}
-        FOR EACH ROW EXECUTE PROCEDURE #{name}();
+        CREATE TRIGGER #{name}_insert_trigger AFTER INSERT ON #{model.table_name}
+          REFERENCING NEW TABLE AS new_table
+          FOR EACH STATEMENT EXECUTE PROCEDURE #{name}();
+        CREATE TRIGGER #{name}_update_trigger AFTER UPDATE ON #{model.table_name}
+          REFERENCING OLD TABLE AS old_table NEW TABLE AS new_table
+          FOR EACH STATEMENT EXECUTE PROCEDURE #{name}();
+        CREATE TRIGGER #{name}_delete_trigger AFTER DELETE ON #{model.table_name}
+          REFERENCING OLD TABLE AS old_table
+          FOR EACH STATEMENT EXECUTE PROCEDURE #{name}();
       SQL
     end
 

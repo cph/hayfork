@@ -24,7 +24,7 @@ class InsertSqlTest < Minitest::Test
             books.id::integer "search_result_id",
             books.title::text "text",
             setweight(to_tsvector('hayfork', replace(books.title::varchar, '-', ' ')), 'C') "search_vector"
-          FROM (SELECT NEW.*) "books") "x"
+          FROM new_table "books") "x"
           WHERE "x"."text" != '';
         SQL
       end
@@ -36,7 +36,7 @@ class InsertSqlTest < Minitest::Test
       assert_equal <<~SQL.squish, insert.to_sql.strip
         INSERT INTO haystack (search_result_type)
         SELECT * FROM
-          (SELECT 'Book'::varchar "search_result_type" FROM (SELECT NEW.*) "books"
+          (SELECT 'Book'::varchar "search_result_type" FROM new_table "books"
           INNER JOIN "authors" ON "authors"."id" = "books"."author_id"
           WHERE "authors"."name" BETWEEN 'Potok' AND 'Tolkien') "x"
         WHERE "x"."text" != '';

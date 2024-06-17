@@ -52,16 +52,6 @@ class HaystackTest < Minitest::Test
         ], Haystack.pluck(:search_result_id, :field, :text).to_set
       end
     end
-
-    context "Changing a book's ISBN" do
-      should "do nothing to the haystack if the ISBN isn't used" do
-        book = Book.create!(title: "The Chosen", isbn: "0449213447")
-
-        before = Haystack.pluck(:id)
-        book.update_column :isbn, "9780449213445"
-        assert_equal before, Haystack.pluck(:id)
-      end
-    end
   end
 
 

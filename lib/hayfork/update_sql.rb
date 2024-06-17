@@ -12,13 +12,9 @@ module Hayfork
     end
 
     def to_sql
-      sql = values_to_check_on_update.map { |field| "OLD.#{field} IS DISTINCT FROM NEW.#{field}" }.join(" OR ")
-
       <<-SQL
-    IF #{sql} THEN
       #{delete.to_sql.strip}
       #{insert.to_sql.strip}
-    END IF;
       SQL
     end
     alias to_s to_sql
