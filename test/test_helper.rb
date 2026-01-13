@@ -16,13 +16,14 @@ require "support/models/book"
 require "support/models/haystack"
 
 connection_url = "'postgresql://#{ENV["POSTGRES_USER"]}:#{ENV["POSTGRES_PASSWORD"]}@localhost:5432'" if ENV["POSTGRES_PASSWORD"]
-system "psql #{connection_url} -c 'create database hayfork_test'"
+system "psql #{connection_url} -c 'create database hayfork_test'" if connection_url
+system "psql -U postgres -h localhost -c 'create database hayfork_test'" unless connection_url
 
 ActiveRecord::Base.establish_connection(
   adapter: "postgresql",
   host: "localhost",
   database: "hayfork_test",
-  username: ENV["POSTGRES_USER"],
+  username: ENV["POSTGRES_USER"] || "postgres",
   password: ENV["POSTGRES_PASSWORD"],
   verbosity: "quiet")
 

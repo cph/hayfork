@@ -27,6 +27,18 @@ class DeleteSqlTest < Minitest::Test
           AND haystack.search_result_id=x.search_result_id;
         SQL
       end
+
+      should "DELETE by row if configured as such" do
+        assert_equal <<~SQL.squish, delete.to_sql(by_row: true).strip
+          DELETE FROM haystack
+          USING (SELECT
+            'Book'::varchar "search_result_type",
+            books.id::integer "search_result_id"
+          FROM (SELECT OLD.*) "books") "x"
+          WHERE haystack.search_result_type=x.search_result_type
+          AND haystack.search_result_id=x.search_result_id;
+        SQL
+      end
     end
 
     should "incorporate relation's joins and conditions" do

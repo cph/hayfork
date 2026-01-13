@@ -54,6 +54,27 @@ class HaystackTest < Minitest::Test
     end
   end
 
+  context "If we're maintaining books in the haystack by row" do
+    setup do
+      triggers(by_row: true) do
+        foreach Book do |index|
+          index.insert(:title)
+          index.insert(:description)
+        end
+      end
+    end
+
+    context "Changing a book's ISBN" do
+      should "do nothing to the haystack if the ISBN isn't used" do
+        book = Book.create!(title: "The Chosen", isbn: "0449213447")
+
+        before = Haystack.pluck(:id)
+        book.update_column :isbn, "9780449213445"
+        assert_equal before, Haystack.pluck(:id)
+      end
+    end
+  end
+
 
   context "If we're maintaining a belongs_to relationship" do
     setup do
@@ -152,8 +173,8 @@ class HaystackTest < Minitest::Test
 
 private
 
-  def triggers(&block)
-    triggers = Hayfork.maintain(Haystack, &block)
+  def triggers(by_row: false, &block)
+    triggers = Hayfork.maintain(Haystack, by_row: by_row, &block)
     Haystack.connection.execute triggers.replace
   end
 
