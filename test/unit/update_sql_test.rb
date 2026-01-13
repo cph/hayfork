@@ -26,6 +26,42 @@ class UpdateSqlTest < Minitest::Test
         SQL
       end
     end
+
+    context "when configured to use row-based triggers" do
+      setup do
+        @relation = Book.all
+        @bindings = [
+          Binding(Hayfork::SEARCH_RESULT_TYPE, "Book"),
+          Binding(Hayfork::SEARCH_RESULT_ID, Book.arel_table[:id]),
+          Binding(Hayfork::TEXT, Book.arel_table[:title]),
+          Binding(Hayfork::SEARCH_VECTOR, Book.arel_table[:title]),
+          Binding("another_field", Book.arel_table[:isbn]),
+        ]
+      end
+
+      context "when the model uses attr_readonly" do
+        setup do
+          Book.attr_readonly :isbn
+          fail "isbn should be readonly now" unless Book.readonly_attributes.member?("isbn")
+        end
+
+        teardown do
+          Book.readonly_attributes.delete "isbn"
+          fail "isbn should not be readonly now" if Book.readonly_attributes.member?("isbn")
+        end
+
+        should "not check values that are readonly" do
+          stub(update).delete.stub!.to_sql.returns("<!-- DELETE -->")
+          stub(update).insert.stub!.to_sql.returns("<!-- INSERT -->")
+          assert_equal <<~SQL.squish, update.to_sql(by_row: true).squish.strip
+            IF OLD.title IS DISTINCT FROM NEW.title THEN
+              <!-- DELETE -->
+              <!-- INSERT -->
+            END IF;
+          SQL
+        end
+      end
+    end
   end
 
 

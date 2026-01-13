@@ -24,8 +24,8 @@ module Hayfork
   class << self
     attr_accessor :default_weight, :default_dictionary
 
-    def maintain(haystack, &block)
-      triggers = Triggers.new(haystack)
+    def maintain(haystack, by_row: false, &block)
+      triggers = Triggers.new(haystack, by_row: by_row)
       TriggerBuilder.new(triggers).instance_eval(&block)
       haystack.singleton_class.send(:attr_reader, :triggers)
       haystack.instance_variable_set :@triggers, triggers

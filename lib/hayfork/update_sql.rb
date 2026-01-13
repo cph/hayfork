@@ -11,11 +11,20 @@ module Hayfork
       @bindings = bindings
     end
 
-    def to_sql
-      <<-SQL
-      #{delete.to_sql.strip}
-      #{insert.to_sql.strip}
+    def to_sql(by_row: false)
+      checks = values_to_check_on_update.map { |field| "OLD.#{field} IS DISTINCT FROM NEW.#{field}" }.join(" OR ")
+
+      sql = [<<~SQL]
+        #{delete.to_sql(by_row: by_row).strip}
+        #{insert.to_sql(by_row: by_row).strip}
       SQL
+
+      sql.unshift <<~SQL if by_row
+        IF #{checks} THEN
+      SQL
+      sql << "END IF;" if by_row
+
+      sql.join("\n")
     end
     alias to_s to_sql
 

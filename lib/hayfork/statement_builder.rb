@@ -38,14 +38,14 @@ module Hayfork
       statements.map { |statement| "    " << statement.insert.to_sql(**args) }.join.strip
     end
 
-    def to_update_sql
+    def to_update_sql(**args)
       updates = statements.select(&:may_change_on_update?)
       return "-- nothing to update" if updates.empty?
-      updates.map { |statement| "    " << statement.update.to_sql.lstrip }.join.strip
+      updates.map { |statement| "    " << statement.update.to_sql(**args).lstrip }.join.strip
     end
 
-    def to_delete_sql
-      statements.map { |statement| "    " << statement.delete.to_sql }.join.strip
+    def to_delete_sql(**args)
+      statements.map { |statement| "    " << statement.delete.to_sql(**args) }.join.strip
     end
 
 

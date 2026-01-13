@@ -8,9 +8,11 @@ module Hayfork
       @bindings = bindings.reject { |binding| binding.key == Hayfork::SEARCH_VECTOR || binding.key == Hayfork::TEXT }
     end
 
-    def to_sql
+    def to_sql(by_row: false)
       select_statement = relation.select(bindings.map(&:to_s))
-      select_statement = select_statement.from("old_table \"#{relation.table_name}\"")
+      select_statement = by_row ?
+        select_statement.from("(SELECT OLD.*) \"#{relation.table_name}\"") :
+        select_statement.from("old_table \"#{relation.table_name}\"")
 
       constraints = bindings.map { |binding| "#{haystack.table_name}.#{binding.key}=x.#{binding.key}" }.join(" AND ")
 

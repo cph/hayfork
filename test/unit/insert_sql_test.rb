@@ -28,6 +28,19 @@ class InsertSqlTest < Minitest::Test
           WHERE "x"."text" != '';
         SQL
       end
+
+      should "INSERT by row if configured as such" do
+        assert_equal <<~SQL.squish, insert.to_sql(by_row: true).strip
+          INSERT INTO haystack (search_result_type, search_result_id, text, search_vector)
+          SELECT * FROM (SELECT
+            'Book'::varchar "search_result_type",
+            books.id::integer "search_result_id",
+            books.title::text "text",
+            setweight(to_tsvector('hayfork', replace(books.title::varchar, '-', ' ')), 'C') "search_vector"
+          FROM (SELECT NEW.*) "books") "x"
+          WHERE "x"."text" != '';
+        SQL
+      end
     end
 
     should "incorporate relation's joins and conditions" do
